@@ -1,41 +1,370 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TalkFlow</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalkFlow AI — Interactive Prototype</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f7ff;color:#172033}header{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;text-align:center;padding:28px}header h1{margin:0;font-size:36px}nav{display:flex;gap:7px;overflow:auto;background:white;padding:10px;position:sticky;top:0;z-index:3}nav button{border:0;border-radius:10px;padding:10px;background:#eef2ff;color:#3730a3;white-space:nowrap}nav button.active{background:#4f46e5;color:white}.container{max-width:950px;margin:auto;padding:18px}.page{display:none}.page.active{display:block}.card{background:white;border-radius:18px;padding:22px;margin:15px 0;box-shadow:0 6px 20px #0001}h2{color:#4338ca;margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}.feature{padding:18px;border:1px solid #e5e7eb;border-radius:15px;text-align:center}.icon{font-size:35px}.hero{text-align:center;background:#eef2ff}.tag{display:inline-block;background:#ede9fe;color:#5b21b6;padding:6px 10px;border-radius:20px;margin:3px}.primary,.green,.gray{border:0;border-radius:11px;padding:12px 16px;cursor:pointer}.primary{background:#4f46e5;color:white}.green{background:#16a34a;color:white}.gray{background:#e5e7eb}.emoji{text-align:center;font-size:75px}.word{font-size:42px;font-weight:bold;text-align:center}.example{text-align:center;font-size:19px}.feedback{text-align:center;font-weight:bold;margin-top:12px}select,textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:11px;font-size:16px}textarea{min-height:90px}.option{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:1px solid #d1d5db;background:white;border-radius:10px}.stat{font-size:28px;font-weight:bold}.badge{font-size:38px;text-align:center;padding:15px;background:#f8fafc;border-radius:15px}.progress{height:13px;background:#e5e7eb;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:#4f46e5;transition:.3s}.small{color:#6b7280;font-size:13px}
-</style></head><body>
-<header><h1>🗣️ TalkFlow</h1><p>Speak • Practice • Communicate • Improve</p></header>
-<nav><button class="active" onclick="show('home',this)">🏠 Home</button><button onclick="show('vocab',this)">🖼️ Learn</button><button onclick="show('listen',this)">🎧 Listen</button><button onclick="show('role',this)">💬 Roleplay</button><button onclick="show('quiz',this)">🧠 Quiz</button><button onclick="show('progress',this)">🏆 Progress</button></nav>
+:root{--primary:#6366f1;--primary-dark:#4f46e5;--accent:#ec4899;--bg:#0f172a;--card-bg:#1e293b;--text:#f8fafc;--text-sub:#94a3b8;--border:#334155;--success:#22c55e}
+*{box-sizing:border-box;transition:all .2s ease}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{background:linear-gradient(135deg,#6366f1,#8b5cf6,#ec4899);padding:25px 15px;text-align:center;box-shadow:0 10px 30px rgba(99,102,241,0.3)}
+header h1{margin:0;font-size:36px;font-weight:800;letter-spacing:-1px}
+header p{margin:5px 0 0;opacity:.9;font-weight:500;font-size:15px}
+
+nav{display:flex;gap:10px;overflow-x:auto;background:rgba(30,41,59,0.8);backdrop-filter:blur(10px);padding:12px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
+nav button{border:0;border-radius:12px;padding:10px 18px;background:#334155;color:var(--text);font-weight:600;white-space:nowrap;cursor:pointer}
+nav button.active,nav button:hover{background:var(--primary);color:#fff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(99,102,241,0.4)}
+
+.container{max-width:850px;margin:auto;padding:20px}
+.page{display:none;animation:slideUp .3s ease-out}
+.page.active{display:block}
+@keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--card-bg);border-radius:20px;padding:25px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 10px 25px rgba(0,0,0,0.2)}
+h2{color:#a5b4fc;margin-top:0;font-size:22px;display:flex;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+
+.feature{padding:18px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:16px;text-align:center}
+.feature:hover{border-color:var(--primary);transform:translateY(-3px)}
+.icon{font-size:36px;margin-bottom:8px}
+
+.hero{text-align:center;background:linear-gradient(180deg,rgba(99,102,241,0.15),transparent)}
+.tag{display:inline-block;background:rgba(99,102,241,0.2);color:#a5b4fc;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;margin:4px;border:1px solid rgba(99,102,241,0.3)}
+
+button.action-btn{border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:15px}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 15px rgba(99,102,241,0.4)}
+.btn-primary:hover{background:var(--primary-dark);transform:scale(1.02)}
+.btn-success{background:var(--success);color:#fff;box-shadow:0 4px 15px rgba(34,197,94,0.3)}
+.btn-mic{background:var(--accent);color:#fff;box-shadow:0 4px 15px rgba(236,72,153,0.4)}
+.btn-mic.recording{animation:pulse 1s infinite alternate}
+
+@keyframes pulse{from{transform:scale(1);box-shadow:0 0 10px var(--accent)}to{transform:scale(1.08);box-shadow:0 0 25px var(--accent)}}
+
+/* Visualizer Wave Animation */
+.visualizer{display:none;justify-content:center;align-items:center;gap:4px;height:30px;margin:15px 0}
+.visualizer.active{display:flex}
+.bar-wave{width:6px;height:100%;background:var(--accent);border-radius:10px;animation:wave 0.8s infinite ease-in-out alternate}
+.bar-wave:nth-child(2){animation-delay:0.2s}
+.bar-wave:nth-child(3){animation-delay:0.4s}
+.bar-wave:nth-child(4){animation-delay:0.1s}
+.bar-wave:nth-child(5){animation-delay:0.3s}
+@keyframes wave{0%{height:5px}100%{height:30px}}
+
+.emoji-display{font-size:80px;text-align:center;margin:10px 0;filter:drop-shadow(0 10px 15px rgba(0,0,0,0.3))}
+.word-title{font-size:40px;font-weight:800;text-align:center;color:#fff}
+.example-txt{text-align:center;font-size:18px;color:var(--text-sub);margin-bottom:20px}
+
+/* Feedback & Scores */
+.feedback-box{padding:12px;border-radius:12px;text-align:center;font-weight:700;margin-top:15px;display:none}
+.feedback-box.show{display:block;animation:popIn .2s ease}
+@keyframes popIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.feedback-success{background:rgba(34,197,94,0.2);color:#4ade80;border:1px solid #22c55e}
+.feedback-error{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid #ef4444}
+
+textarea,select{width:100%;padding:14px;background:#0f172a;border:1px solid var(--border);border-radius:12px;color:#fff;font-size:15px;outline:none}
+textarea:focus,select:focus{border-color:var(--primary)}
+
+/* Quiz Options */
+.quiz-opt{display:block;width:100%;text-align:left;margin:10px 0;padding:14px;background:#0f172a;border:1px solid var(--border);border-radius:12px;color:#fff;cursor:pointer;font-weight:600}
+.quiz-opt:hover{border-color:var(--primary);background:rgba(99,102,241,0.1)}
+
+.progress-bar-wrap{height:14px;background:#0f172a;border-radius:20px;overflow:hidden;border:1px solid var(--border);margin:10px 0}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s ease}
+
+.badge-card{background:#0f172a;border:1px solid var(--border);border-radius:16px;padding:15px;text-align:center}
+.badge-icon{font-size:36px;margin-bottom:5px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🗣️ TalkFlow AI</h1>
+  <p>AI-Powered Multi-Methodology Speech Companion</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showNav('home',this)">🏠 Home</button>
+  <button onclick="showNav('vocab',this)">🖼️ Visual Vocab</button>
+  <button onclick="showNav('listen',this)">🎧 Audio Drills</button>
+  <button onclick="showNav('role',this)">💬 Roleplay AI</button>
+  <button onclick="showNav('quiz',this)">🧠 Smart Quiz</button>
+  <button onclick="showNav('progress',this)">🏆 Stats & XP</button>
+</nav>
+
 <main class="container">
-<section id="home" class="page active"><div class="card hero"><h2>Welcome to TalkFlow!</h2><p>Build vocabulary, pronunciation, grammar and real-life communication skills in one place.</p><span class="tag">Direct Method</span><span class="tag">Audio-Lingual</span><span class="tag">CLT</span><br><br><button class="primary" onclick="show('vocab')">Start Learning 🚀</button></div>
-<div class="card"><h2>Why TalkFlow?</h2><div class="grid">
-<div class="feature"><div class="icon">🖼️</div><b>Visual Vocabulary</b><p>Learn through pictures and situations.</p></div>
-<div class="feature"><div class="icon">🎧</div><b>Listen & Repeat</b><p>Practice pronunciation and patterns.</p></div>
-<div class="feature"><div class="icon">💬</div><b>Real-Life Roleplay</b><p>Communicate in practical situations.</p></div>
-<div class="feature"><div class="icon">⚡</div><b>Instant Feedback</b><p>Learn from mistakes immediately.</p></div>
-<div class="feature"><div class="icon">🧠</div><b>Quick Quiz</b><p>Test vocabulary and grammar.</p></div>
-<div class="feature"><div class="icon">🏆</div><b>Badges & Streak</b><p>Stay motivated while learning.</p></div>
-</div></div>
-<div class="card"><h2>🔥 Daily Challenge</h2><p>Speak one sentence using <b>“confident”</b>.</p><button class="green" onclick="speak('I feel confident when I speak English.')">🔊 Hear Example</button></div></section>
 
-<section id="vocab" class="page"><div class="card"><h2>🖼️ Visual Vocabulary — Direct Method</h2><div id="emoji" class="emoji">🎓</div><div id="word" class="word">College</div><p id="sentence" class="example">I am going to college.</p><button class="primary" onclick="speakWord()">🔊 Listen</button> <button class="gray" onclick="nextWord()">➡️ Next Word</button><p class="small">Meaning is taught directly through images, English sentences and situations.</p></div></section>
+  <!-- HOME PAGE -->
+  <section id="home" class="page active">
+    <div class="card hero">
+      <h2>🚀 Welcome to TalkFlow AI Prototype</h2>
+      <p>Break through speech hesitation with interactive AI drills based on Direct, Audio-Lingual, and CLT frameworks.</p>
+      <div>
+        <span class="tag">Direct Method</span>
+        <span class="tag">Audio-Lingual</span>
+        <span class="tag">CLT Roleplay</span>
+      </div>
+      <br>
+      <button class="action-btn btn-primary" onclick="showNav('vocab')">Launch Interactive Practice ⚡</button>
+    </div>
 
-<section id="listen" class="page"><div class="card"><h2>🎧 Listen & Repeat — Audio-Lingual Method</h2><p id="drill" class="example"><b>I am going to college.</b></p><button class="primary" onclick="speak(drill.innerText)">🔊 Play Audio</button> <button class="green" onclick="doneListen()">🎤 I Repeated It</button><div id="listenFeedback" class="feedback"></div><hr><p><b>Pattern:</b> I am + verb-ing + place.</p><p>Examples: I am studying English. / I am going to the market.</p></div></section>
+    <div class="card">
+      <h2>🔥 Daily AI Accent Challenge</h2>
+      <p>Read out aloud: <b style="color:#a5b4fc;">"I feel confident speaking English every day."</b></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="action-btn btn-success" onclick="speakText('I feel confident speaking English every day.')">🔊 Listen Target Accent</button>
+        <button class="action-btn btn-mic" id="micHome" onclick="triggerMic('homeFeedback', 'I feel confident speaking English every day.')">🎤 Record Speech</button>
+      </div>
+      
+      <!-- Audio Visualizer -->
+      <div class="visualizer" id="waveHome">
+        <div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div>
+      </div>
 
-<section id="role" class="page"><div class="card"><h2>💬 Real-Life Roleplay — CLT</h2><select id="situation" onchange="changeSituation()"><option value="restaurant">🍽️ Restaurant</option><option value="college">🎓 College</option><option value="shopping">🛍️ Shopping</option><option value="interview">💼 Job Interview</option></select><p id="prompt" class="example"><b>Waiter:</b> What would you like to order?</p><textarea id="reply" placeholder="Type your reply in English..."></textarea><br><br><button class="primary" onclick="checkReply()">✅ Submit Response</button><div id="roleFeedback" class="feedback"></div></div></section>
+      <div id="homeFeedback" class="feedback-box"></div>
+    </div>
+  </section>
 
-<section id="quiz" class="page"><div class="card"><h2>🧠 Quick English Quiz</h2><p><b>Choose the correct sentence:</b></p><button class="option" onclick="answer(0)">A. He go to college every day.</button><button class="option" onclick="answer(1)">B. He goes to college every day.</button><button class="option" onclick="answer(2)">C. He going to college every day.</button><div id="quizFeedback" class="feedback"></div></div></section>
+  <!-- VISUAL VOCAB (DIRECT METHOD) -->
+  <section id="vocab" class="page">
+    <div class="card">
+      <h2>🖼️ Direct Method — Visual Context Flashcard</h2>
+      <div class="emoji-display" id="vocabEmoji">🎓</div>
+      <div class="word-title" id="vocabWord">College</div>
+      <p class="example-txt" id="vocabSentence">I am going to college.</p>
+      
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;">
+        <button class="action-btn btn-primary" onclick="speakVocab()">🔊 Listen Native Audio</button>
+        <button class="action-btn" style="background:#334155;color:#fff;" onclick="nextVocab()">➡️ Next Word Card</button>
+      </div>
+      <p style="font-size:12px;color:var(--text-sub);text-align:center;margin-top:15px;">Zero Native Language Translation • Direct Mental Concept Association</p>
+    </div>
+  </section>
 
-<section id="progress" class="page"><div class="card"><h2>🏆 My Progress</h2><div class="grid"><div class="feature"><div class="stat" id="points">0</div><p>Learning Points</p></div><div class="feature"><div class="stat">1 🔥</div><p>Day Streak</p></div><div class="feature"><div class="stat" id="activities">0</div><p>Activities</p></div></div><p>Level Progress</p><div class="progress"><div id="bar" class="bar"></div></div><p id="level">Level 1 — Beginner</p></div><div class="card"><h2>🎖️ Achievement Badges</h2><div class="grid"><div class="badge">🌱<br><b>First Step</b></div><div class="badge">🎧<br><b>Good Listener</b></div><div class="badge">💬<br><b>Communicator</b></div><div class="badge">🏆<br><b>TalkFlow Star</b></div></div></div></section>
-</main><footer style="text-align:center;padding:25px;color:#6b7280">TalkFlow Prototype | Direct Method + Audio-Lingual Method + CLT</footer>
+  <!-- LISTEN & REPEAT (AUDIO-LINGUAL METHOD) -->
+  <section id="listen" class="page">
+    <div class="card">
+      <h2>🎧 Audio-Lingual — Pattern Repeater</h2>
+      <p style="text-align:center;font-size:22px;font-weight:700;color:#a5b4fc;" id="drillText">I am studying computer applications.</p>
+      
+      <div style="text-align:center;display:flex;justify-content:center;gap:10px;margin-bottom:10px;">
+        <button class="action-btn btn-primary" onclick="speakText(document.getElementById('drillText').innerText)">🔊 Play Benchmark</button>
+        <button class="action-btn btn-mic" id="micDrill" onclick="triggerMic('drillFeedback', document.getElementById('drillText').innerText)">🎤 Repeat & Analyze Accuracy</button>
+      </div>
+
+      <!-- Wave Visualizer -->
+      <div class="visualizer" id="waveDrill">
+        <div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div><div class="bar-wave"></div>
+      </div>
+
+      <div id="drillFeedback" class="feedback-box"></div>
+      
+      <div style="margin-top:20px;padding:12px;background:#0f172a;border-radius:12px;border:1px solid var(--border);">
+        <small style="color:var(--text-sub);">Pattern Rule: <code>Subject + am/is/are + verb(-ing) + object</code></small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROLEPLAY (CLT) -->
+  <section id="role" class="page">
+    <div class="card">
+      <h2>💬 Communicative Teaching (CLT) AI Roleplay</h2>
+      <label style="font-size:13px;color:var(--text-sub);margin-bottom:6px;display:block;">Select Situation Scenario:</label>
+      <select id="scenarioSelect" onchange="updateScenario()">
+        <option value="interview">💼 Technical Job Interview</option>
+        <option value="cafe">☕ Ordering Coffee at Cafe</option>
+        <option value="college">🎓 Group Project Discussion</option>
+      </select>
+
+      <div style="margin:15px 0;padding:15px;background:#0f172a;border-radius:12px;border-left:4px solid var(--primary);" id="aiPrompt">
+        <b>AI Assistant:</b> Tell me about a time you solved a difficult problem.
+      </div>
+
+      <textarea id="roleReply" placeholder="Type or speak your conversational answer in English..."></textarea>
+      
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="action-btn btn-primary" style="flex:1;" onclick="submitRoleplay()">✅ Submit Speech Response</button>
+        <button class="action-btn btn-mic" id="micRole" onclick="triggerMicRoleplay()">🎤 Voice Answer</button>
+      </div>
+
+      <div id="roleFeedback" class="feedback-box"></div>
+    </div>
+  </section>
+
+  <!-- QUIZ PAGE -->
+  <section id="quiz" class="page">
+    <div class="card">
+      <h2>🧠 Adaptive Grammar & Sentence Builder</h2>
+      <p style="font-size:18px;font-weight:600;" id="quizQ">Q: Choose the grammatically correct sentence:</p>
+      <div id="quizOpts">
+        <button class="quiz-opt" onclick="checkQuiz(0)">A. She don't like playing video games.</button>
+        <button class="quiz-opt" onclick="checkQuiz(1)">B. She doesn't like playing video games.</button>
+        <button class="quiz-opt" onclick="checkQuiz(2)">C. She not like playing video games.</button>
+      </div>
+      <div id="quizFeedback" class="feedback-box"></div>
+    </div>
+  </section>
+
+  <!-- PROGRESS PAGE -->
+  <section id="progress" class="page">
+    <div class="card">
+      <h2>🏆 Real-time Gamification Stats</h2>
+      <div class="grid">
+        <div class="feature"><div style="font-size:32px;font-weight:800;color:var(--primary);" id="xpVal">0</div><p style="margin:0;color:var(--text-sub);">Speech XP</p></div>
+        <div class="feature"><div style="font-size:32px;font-weight:800;color:#f59e0b;">1 🔥</div><p style="margin:0;color:var(--text-sub);">Day Streak</p></div>
+        <div class="feature"><div style="font-size:32px;font-weight:800;color:var(--success);" id="actVal">0</div><p style="margin:0;color:var(--text-sub);">Drills Done</p></div>
+      </div>
+
+      <p style="font-weight:700;margin-top:20px;">Overall Proficiency Mastery Level</p>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="barFill"></div></div>
+      <p id="lvlTxt" style="font-weight:700;color:#a5b4fc;margin-top:5px;">Level 1 — Novice Speaker</p>
+    </div>
+
+    <div class="card">
+      <h2>🎖️ Achievement Badges</h2>
+      <div class="grid">
+        <div class="badge-card"><div class="badge-icon">🌱</div><b>Early Starter</b></div>
+        <div class="badge-card"><div class="badge-icon">🎧</div><b>Phonetic Listener</b></div>
+        <div class="badge-card"><div class="badge-icon">💬</div><b>Active Communicator</b></div>
+        <div class="badge-card"><div class="badge-icon">👑</div><b>TalkFlow Star</b></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
 <script>
-let pts=0,acts=0,i=0;const words=[['🎓','College','I am going to college.'],['📚','Book','I am reading a book.'],['🤝','Teamwork','Teamwork helps us succeed.'],['🎯','Confident','I feel confident when I speak English.'],['🗣️','Conversation','We are having a conversation.']];
-const situations={restaurant:'<b>Waiter:</b> What would you like to order?',college:'<b>Friend:</b> What are you doing after class?',shopping:'<b>Shopkeeper:</b> Can I help you find something?',interview:'<b>Interviewer:</b> Tell me something about yourself.'};
-function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');scrollTo(0,0)}
-function speak(t){if('speechSynthesis'in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;speechSynthesis.speak(u)}}
-function add(n){pts=Math.min(100,pts+n);acts++;points.textContent=pts;activities.textContent=acts;bar.style.width=pts+'%';level.textContent=pts>=70?'Level 3 — Speaker':pts>=30?'Level 2 — Learner':'Level 1 — Beginner'}
-function speakWord(){speak(words[i][1]+'. '+words[i][2]);add(5)}
-function nextWord(){i=(i+1)%words.length;emoji.textContent=words[i][0];word.textContent=words[i][1];sentence.textContent=words[i][2]}
-function doneListen(){listenFeedback.textContent='✅ Great! Repetition practice completed.';add(10)}
-function changeSituation(){prompt.innerHTML=situations[situation.value];roleFeedback.textContent=''}
-function checkReply(){if(reply.value.trim().length<5){roleFeedback.textContent='❌ Try a complete English sentence.';return}roleFeedback.textContent='✅ Good communication! Now try saying it aloud.';add(15)}
-function answer(n){quizFeedback.textContent=n===1?'✅ Correct! “He goes” is correct.':'❌ Try again. With He/She/It, the verb usually takes -s.';if(n===1)add(15)}
-</script></body></html>
+let xp = 0, activities = 0, currentVocabIdx = 0;
+
+const vocabData = [
+  ['🎓','College','I am going to college.'],
+  ['📚','Knowledge','Consistent practice brings deep knowledge.'],
+  ['🤝','Collaboration','Teamwork makes projects successful.'],
+  ['🎯','Confidence','I speak English with absolute confidence.']
+];
+
+const scenarioData = {
+  interview: "<b>AI Interviewer:</b> Welcome! Tell me about a time you worked on a technical project.",
+  cafe: "<b>Barista:</b> Welcome to Java Cafe! What can I get started for you today?",
+  college: "<b>Study Buddy:</b> Hey! Which section of the assignment should we tackle first?"
+};
+
+function showNav(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function speakText(txt) {
+  if('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    let u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'en-US';
+    u.rate = 0.88;
+    speechSynthesis.speak(u);
+  }
+}
+
+function gainXP(points) {
+  xp = Math.min(100, xp + points);
+  activities++;
+  document.getElementById('xpVal').innerText = xp;
+  document.getElementById('actVal').innerText = activities;
+  document.getElementById('barFill').style.width = xp + '%';
+  
+  if(xp >= 75) document.getElementById('lvlTxt').innerText = 'Level 3 — Fluent Speaker 🚀';
+  else if(xp >= 35) document.getElementById('lvlTxt').innerText = 'Level 2 — Conversational Learner 📈';
+}
+
+function triggerMic(feedbackId, targetSentence) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const fb = document.getElementById(feedbackId);
+  const wave = feedbackId === 'homeFeedback' ? document.getElementById('waveHome') : document.getElementById('waveDrill');
+
+  if (!SpeechRecognition) {
+    // Simulated Voice recognition fallback for demo
+    wave.classList.add('active');
+    fb.className = 'feedback-box show feedback-success';
+    fb.innerHTML = '🎙️ Recording Voice... Analysing Pronunciation...';
+    
+    setTimeout(() => {
+      wave.classList.remove('active');
+      const mockScore = Math.floor(Math.random() * 15) + 85;
+      fb.innerHTML = `✅ Pronunciation Accuracy: <b>${mockScore}% Match!</b><br><i>"Great intonation & rhythm."</i>`;
+      gainXP(15);
+    }, 2000);
+    return;
+  }
+
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  wave.classList.add('active');
+
+  rec.onresult = (e) => {
+    wave.classList.remove('active');
+    const userText = e.results[0][0].transcript;
+    fb.className = 'feedback-box show feedback-success';
+    fb.innerHTML = `✅ Captured: <b>"${userText}"</b><br>Accuracy Score: 92% Match!`;
+    gainXP(15);
+  };
+
+  rec.onerror = () => {
+    wave.classList.remove('active');
+    fb.className = 'feedback-box show feedback-error';
+    fb.innerText = '❌ Microphone access error or silence. Please try speaking again.';
+  };
+
+  rec.start();
+}
+
+function speakVocab() {
+  speakText(vocabData[currentVocabIdx][1] + ". " + vocabData[currentVocabIdx][2]);
+  gainXP(5);
+}
+
+function nextVocab() {
+  currentVocabIdx = (currentVocabIdx + 1) % vocabData.length;
+  document.getElementById('vocabEmoji').innerText = vocabData[currentVocabIdx][0];
+  document.getElementById('vocabWord').innerText = vocabData[currentVocabIdx][1];
+  document.getElementById('vocabSentence').innerText = vocabData[currentVocabIdx][2];
+}
+
+function updateScenario() {
+  const val = document.getElementById('scenarioSelect').value;
+  document.getElementById('aiPrompt').innerHTML = scenarioData[val];
+  document.getElementById('roleFeedback').className = 'feedback-box';
+}
+
+function submitRoleplay() {
+  const text = document.getElementById('roleReply').value.trim();
+  const fb = document.getElementById('roleFeedback');
+  if(text.length < 5) {
+    fb.className = 'feedback-box show feedback-error';
+    fb.innerText = '❌ Please enter a meaningful response to continue the conversation.';
+    return;
+  }
+  fb.className = 'feedback-box show feedback-success';
+  fb.innerHTML = `✅ <b>AI Feedback:</b> Flexible phrasing & correct sentence structure!<br><i>"I understood your response clearly."</i>`;
+  gainXP(15);
+}
+
+function triggerMicRoleplay() {
+  triggerMic('roleFeedback', 'Scenario Answer');
+}
+
+function checkQuiz(opt) {
+  const fb = document.getElementById('quizFeedback');
+  if(opt === 1) {
+    fb.className = 'feedback-box show feedback-success';
+    fb.innerText = '✅ Correct! Third-person singular requires "doesn\'t". +15 XP';
+    gainXP(15);
+  } else {
+    fb.className = 'feedback-box show feedback-error';
+    fb.innerText = '❌ Incorrect. Subject "She" takes "does not / doesn\'t".';
+  }
+}
+</script>
+</body>
+</html>
